@@ -21,6 +21,10 @@ def extract_stock_list_thead(URL):
 
     # delete 토론실
     stock_thead_list[-1] = "Detail URL"
+
+    # add code
+    stock_thead_list.append("CODE")
+
     return stock_thead_list
 
 
@@ -61,8 +65,8 @@ def extract_stock_list_tbody(URL):
     stocks_volume = []  # 거래량
     stocks_PER = []     # PER
     stocks_ROE = []     # ROE
-    
     stocks_detail_dict = extract_stock_detail_url(stock_table)  #{STOCK_NAME, URL}
+    stocks_CODE = []
 
     # extract tbody
     for tr in stock_tbody_tr:
@@ -130,6 +134,12 @@ def extract_stock_list_tbody(URL):
 
             temp.append(stocks_detail_dict[NAME])  # Detail URL
 
+            # CODE
+            # [/item/main.nhn?code=005190] => ['/item/main.nhn?code', '005190']
+            CODE = HREF.split('=')[-1]
+            stocks_CODE.append(CODE)
+            temp.append(CODE)
+            
             stocks_tbody.append(temp)
     
     return stocks_tbody

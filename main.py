@@ -5,7 +5,6 @@ from save import save_to_file
 
 MAX_PAGE_NUM = 32
 STOCK_LIST_URL = "https://finance.naver.com/sise/sise_market_sum.nhn?sosok=0&page="
-# STOCK_DETAIL_URL = "https://finance.naver.com"
 
 stocks_table = []
 stocks_table.append(extract_stock_list_thead(f"{STOCK_LIST_URL}{1}"))
