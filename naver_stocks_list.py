@@ -3,6 +3,8 @@
 import requests
 from bs4 import BeautifulSoup
 
+STOCK_DETAIL_URL = "https://finance.naver.com"
+
 def extract_stock_list_thead(URL):
     result = requests.get(URL)
     soup = BeautifulSoup(result.text, "html.parser")
@@ -17,24 +19,21 @@ def extract_stock_list_thead(URL):
     for name in stock_thead:
         stock_thead_list.append(name.string)
 
-    return stock_thead_list[0:-1] # delete 토론실
+    # delete 토론실
+    stock_thead_list[-1] = "Detail URL"
+    return stock_thead_list
 
 
-def extract_stock_detail_url(URL):
-    result = requests.get(URL)
-    soup = BeautifulSoup(result.text, "html.parser")
-
-    all_stock_info = soup.find("div", {"class": "box_type_l"})  # stocks list - kospi , kosdaq - tab_style_1
-    stock_table = all_stock_info.find("table", {"class": "type_2"})  # table list
+def extract_stock_detail_url(stock_table):
     titles = stock_table.find_all("a", {"class": "tltle"})  # stock_name, stock_link
 
-    stocks_detail_list = []
+    stocks_detail_dict = {}
 
     # extract stocks_info
     for stock in titles:
-        stocks_detail_list.append([stock.string, stock['href']])
+        stocks_detail_dict[stock.string] = f"{STOCK_DETAIL_URL}{stock['href']}"
 
-    return stocks_detail_list
+    return stocks_detail_dict
 
 
 def extract_stock_list_tbody(URL):
@@ -62,6 +61,8 @@ def extract_stock_list_tbody(URL):
     stocks_volume = []  # 거래량
     stocks_PER = []     # PER
     stocks_ROE = []     # ROE
+    
+    stocks_detail_dict = extract_stock_detail_url(stock_table)  #{STOCK_NAME, URL}
 
     # extract tbody
     for tr in stock_tbody_tr:
@@ -126,6 +127,8 @@ def extract_stock_list_tbody(URL):
             ROE = NUMBER[9].string  # ROE
             stocks_ROE.append(ROE)
             temp.append(ROE)
+
+            temp.append(stocks_detail_dict[NAME])  # Detail URL
 
             stocks_tbody.append(temp)
     
