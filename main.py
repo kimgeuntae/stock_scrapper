@@ -2,7 +2,7 @@
 
 from naver_stocks_list import extract_stock_list_tbody, extract_stock_list_thead, extract_stock_detail_url
 from save import save_list_to_file
-from stock_evaluation import is_over
+from stock_evaluation import is_over, is_under
 
 MAX_PAGE_NUM = 32
 STOCK_LIST_URL = "https://finance.naver.com/sise/sise_market_sum.nhn?sosok=0&page="
@@ -21,7 +21,7 @@ CAPI_STANDARD = 3000  # 시가총액
 TOTAL_STANDARD = []   # 상장 주식수
 FOREIGN_STANDARD = [] # 외국인 비율
 VOLUME_STANDARD = []  # 거래량
-PER_STANDARD = []     # PER
+PER_STANDARD = 10     # PER
 ROE_STANDARD = 5  # ROE
 
 capi_rank_stocks_table = []
@@ -67,11 +67,14 @@ save_list_to_file(f"{CSV_FORDER}/{FNAME_CAPI_OVER_3000_STOCKS}.{FILE_FORMAT}", t
 temp_check_low_stocks_list.clear()
 temp_check_low_stocks_list.append(capi_rank_thead)
 for stock_list in temp_list:
-    temp_ROE = stock_list[11].replace(",","")
-    if is_over(temp_ROE, ROE_STANDARD):
-        temp_check_low_stocks_list.append(stock_list)
+    temp_PER = stock_list[10].replace(",","")
+    temp_ROE = stock_list[11].replace(",", "")
+    
+    if is_under(temp_PER, PER_STANDARD):
+        if is_over(temp_ROE, ROE_STANDARD):
+            temp_check_low_stocks_list.append(stock_list)
 
-########### SAVE CAPI_OVER_3000_STOCKS ###########
+########### SAVE checked PER, ROE ###########
 save_list_to_file(f"{CSV_FORDER}/{FNAME_LOW_VALUATION_LIST}.{FILE_FORMAT}", temp_check_low_stocks_list)
 
 

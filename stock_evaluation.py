@@ -12,9 +12,10 @@ def is_over(type_data, type_standard):
         return False
 
 def is_under(type_data, type_standard):
-    if type_data < type_standard:
-        return True
-    return False
+    if is_digit(type_data):
+        if float(type_data) <= float(type_standard):
+            return True
+        return False
 
 def is_digit(str):
     try:
