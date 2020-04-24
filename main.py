@@ -10,7 +10,7 @@ STOCK_LIST_URL = "https://finance.naver.com/sise/sise_market_sum.nhn?sosok=0&pag
 CSV_FORDER = "rank_csv"
 FILE_FORMAT = "csv"
 FNAME_CAPITALIZATION_RANK = "capitalization_rank"
-FNAME_LOW_VALUATION_LIST = "low_valuation _list"
+FNAME_LOW_VALUATION_LIST = "low_valuation_list"
 FNAME_CAPI_OVER_3000_STOCKS = "capi_over_3000_stocks"
 
 PRICE_STANDARD = 100000   # 현재가
@@ -22,7 +22,7 @@ TOTAL_STANDARD = []   # 상장 주식수
 FOREIGN_STANDARD = [] # 외국인 비율
 VOLUME_STANDARD = []  # 거래량
 PER_STANDARD = []     # PER
-ROE_STANDARD = []  # ROE
+ROE_STANDARD = 5  # ROE
 
 capi_rank_stocks_table = []
 low_value_list = []
@@ -33,8 +33,11 @@ capi_rank_tbody = []
 capi_rank_stocks_table.append(capi_rank_thead)
 low_value_list.append(capi_rank_thead)
 
+low_stocks_list = []
 temp_check_low_stocks_list = []
+temp_list = []
 
+# build capi_rank_stocks_table
 for n in range(MAX_PAGE_NUM):
     URL = f"{STOCK_LIST_URL}{n+1}"
 
@@ -47,12 +50,28 @@ for n in range(MAX_PAGE_NUM):
 save_list_to_file(f"{CSV_FORDER}/{FNAME_CAPITALIZATION_RANK}.{FILE_FORMAT}", capi_rank_stocks_table)
 
 
+# build capi_over_3000_stocks
+temp_check_low_stocks_list.append(capi_rank_thead)
+
 for stock_list in capi_rank_tbody:
     temp_capi = stock_list[6].replace(",","")
     if is_over(temp_capi, CAPI_STANDARD):
+        temp_list.append(stock_list)
         temp_check_low_stocks_list.append(stock_list)
 
 ########### SAVE CAPI_OVER_3000_STOCKS ###########
 save_list_to_file(f"{CSV_FORDER}/{FNAME_CAPI_OVER_3000_STOCKS}.{FILE_FORMAT}", temp_check_low_stocks_list)
+
+
+# build low_valuation_list
+temp_check_low_stocks_list.clear()
+temp_check_low_stocks_list.append(capi_rank_thead)
+for stock_list in temp_list:
+    temp_ROE = stock_list[11].replace(",","")
+    if is_over(temp_ROE, ROE_STANDARD):
+        temp_check_low_stocks_list.append(stock_list)
+
+########### SAVE CAPI_OVER_3000_STOCKS ###########
+save_list_to_file(f"{CSV_FORDER}/{FNAME_LOW_VALUATION_LIST}.{FILE_FORMAT}", temp_check_low_stocks_list)
 
 

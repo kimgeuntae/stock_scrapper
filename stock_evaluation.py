@@ -1,20 +1,27 @@
 # -*- coding: utf-8 -*-
 
+def append_from_list_to_list(from_list, to_list):
+    for data in from_list:
+        to_list.append(data)
+    return to_list
+
 def is_over(type_data, type_standard):
-    if float(type_data) >= float(type_standard):
-        return True
-    return False
+    if is_digit(type_data):
+        if float(type_data) >= float(type_standard):
+            return True
+        return False
 
 def is_under(type_data, type_standard):
     if type_data < type_standard:
         return True
     return False
 
-
-# over capi 3000
-def is_safe_stock(capi):
-    return is_over(capi, 3000)
-
+def is_digit(str):
+    try:
+        tmp = float(str)
+        return True
+    except ValueError:
+        return False
 
 
 
