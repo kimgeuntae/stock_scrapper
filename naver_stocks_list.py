@@ -60,7 +60,7 @@ def extract_stock_list_tbody(URL):
     stocks_fluc = []    # 등락률
     stocks_par = []     # 액면가
     stocks_capi = []    # 시가총액
-    stocks_total = []   # 상장 주식수
+    stocks_total_stocks = []   # 상장 주식수
     stocks_foreign = [] # 외국인 비율
     stocks_volume = []  # 거래량
     stocks_PER = []     # PER
@@ -113,7 +113,7 @@ def extract_stock_list_tbody(URL):
             temp.append(CAPI)
 
             TOTAL = NUMBER[5].string  # 상장 주식수
-            stocks_total.append(TOTAL)
+            stocks_total_stocks.append(TOTAL)
             temp.append(TOTAL)
 
             FOREIGN = NUMBER[6].string  # 외국인 비율
