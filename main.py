@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from datetime import datetime
 from naver_stocks_list import extract_stock_list_tbody, extract_stock_list_thead, extract_stock_detail_url
 from save import save_list_to_file
 from stock_evaluation import is_over, is_under
@@ -7,11 +8,12 @@ from stock_evaluation import is_over, is_under
 MAX_PAGE_NUM = 32
 STOCK_LIST_URL = "https://finance.naver.com/sise/sise_market_sum.nhn?sosok=0&page="
 
+TODAY = datetime.today().strftime("%Y%m%d")
 CSV_FORDER = "rank_csv"
 FILE_FORMAT = "csv"
-FNAME_CAPITALIZATION_RANK = "capitalization_rank"
-FNAME_LOW_VALUATION_LIST = "low_valuation_list"
-FNAME_CAPI_OVER_3000_STOCKS = "capi_over_3000_stocks"
+FNAME_CAPITALIZATION_RANK = f"{TODAY}_capitalization_rank"
+FNAME_LOW_VALUATION_LIST = f"{TODAY}_low_valuation_list"
+FNAME_CAPI_OVER_3000_STOCKS = f"{TODAY}_capi_over_3000_stocks"
 
 PRICE_STANDARD = 100000   # 현재가
 DIFF_STANDARD = []    # 전일비

@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 
 
-STOCK_URL = "https://finance.naver.com/item/main.nhn?code=005930"
+STOCK_URL = "https://finance.daum.net/domestic/market_cap?market=KOSPI"
 
 result = requests.get(STOCK_URL)
 
