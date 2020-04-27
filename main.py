@@ -5,16 +5,6 @@ from naver_stocks_list import extract_stock_list_tbody, extract_stock_list_thead
 from save import save_list_to_file
 from stock_evaluation import is_over, is_under
 
-MAX_PAGE_NUM = 32
-STOCK_LIST_URL = "https://finance.naver.com/sise/sise_market_sum.nhn?sosok=0&page="
-
-TODAY = datetime.today().strftime("%Y%m%d")
-CSV_FORDER = "rank_csv"
-FILE_FORMAT = "csv"
-FNAME_CAPITALIZATION_RANK = f"{TODAY}_capitalization_rank"
-FNAME_LOW_VALUATION_LIST = f"{TODAY}_low_valuation_list"
-FNAME_CAPI_OVER_3000_STOCKS = f"{TODAY}_capi_over_3000_stocks"
-
 PRICE_STANDARD = 100000   # 현재가
 DIFF_STANDARD = []    # 전일비
 FLUC_STANDARD = []    # 등락률
@@ -25,6 +15,16 @@ FOREIGN_STANDARD = [] # 외국인 비율
 VOLUME_STANDARD = []  # 거래량
 PER_STANDARD = 10     # PER
 ROE_STANDARD = 5  # ROE
+
+MAX_PAGE_NUM = 32
+STOCK_LIST_URL = "https://finance.naver.com/sise/sise_market_sum.nhn?sosok=0&page="
+
+TODAY = datetime.today().strftime("%Y%m%d")
+CSV_FORDER = "rank_csv"
+FILE_FORMAT = "csv"
+FNAME_CAPITALIZATION_RANK = f"{TODAY}_capitalization_rank"
+FNAME_LOW_VALUATION_LIST = f"{TODAY}_low_valuation_list"
+FNAME_CAPI_OVER_STANDARD_STOCKS = f"{TODAY}_capi_over_{CAPITALIZATION_STANDARD}_stocks"
 
 capi_rank_stocks_table = []
 low_value_list = []
@@ -52,7 +52,7 @@ for n in range(MAX_PAGE_NUM):
 save_list_to_file(f"{CSV_FORDER}/{FNAME_CAPITALIZATION_RANK}.{FILE_FORMAT}", capi_rank_stocks_table)
 
 
-# build capi_over_3000_stocks
+# build capi_over_standard_stocks
 temp_check_low_stocks_list.append(capi_rank_thead)
 
 for stock_list in capi_rank_tbody:
@@ -61,8 +61,8 @@ for stock_list in capi_rank_tbody:
         temp_list.append(stock_list)
         temp_check_low_stocks_list.append(stock_list)
 
-########### SAVE CAPI_OVER_3000_STOCKS ###########
-save_list_to_file(f"{CSV_FORDER}/{FNAME_CAPI_OVER_3000_STOCKS}.{FILE_FORMAT}", temp_check_low_stocks_list)
+########### SAVE CAPI_OVER_STANDARD_STOCKS ###########
+save_list_to_file(f"{CSV_FORDER}/{FNAME_CAPI_OVER_STANDARD_STOCKS}.{FILE_FORMAT}", temp_check_low_stocks_list)
 
 
 # build low_valuation_list
