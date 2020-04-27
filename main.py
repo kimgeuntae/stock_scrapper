@@ -19,7 +19,7 @@ PRICE_STANDARD = 100000   # 현재가
 DIFF_STANDARD = []    # 전일비
 FLUC_STANDARD = []    # 등락률
 PAR_STANDARD = []  # 액면가
-CAPI_STANDARD = 3000  # 시가총액
+CAPITALIZATION_STANDARD = 3000  # 시가총액
 TOTAL_STOCKS_STANDARD = []   # 상장 주식수
 FOREIGN_STANDARD = [] # 외국인 비율
 VOLUME_STANDARD = []  # 거래량
@@ -57,7 +57,7 @@ temp_check_low_stocks_list.append(capi_rank_thead)
 
 for stock_list in capi_rank_tbody:
     temp_capi = stock_list[6].replace(",","")
-    if is_over(temp_capi, CAPI_STANDARD):
+    if is_over(temp_capi, CAPITALIZATION_STANDARD):
         temp_list.append(stock_list)
         temp_check_low_stocks_list.append(stock_list)
 

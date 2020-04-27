@@ -81,6 +81,7 @@ def get_PBR(stock_price, BPS):
     calc_PBR = stock_price / BPS
     return calc_PBR
 
+# 부채비율
 def get_debt_percent(stock_dict, debt_standard):
     # profit
     total_assets = stock_dict["total_assets"]  # 자산총계
@@ -102,3 +103,29 @@ def get_debt_percent(stock_dict, debt_standard):
         return False    # 높으면 제외.
     else:
         return True
+
+# 주가 매출 비율 - 1 미만시 주가보다 매출이 높음 lower than 1 better
+def get_PSR(stock_dict):
+    capitalization = stock_dict["capitalization"]  # 시가총액
+    total_sales = stock_dict["total_sales"]    # 총 매출액
+
+    PSR = capitalization / total_sales
+
+    return PSR
+
+# 기업 가치
+def get_EV(stock_dict):
+    capitalization = stock_dict["capitalization"]  # 시가총액
+    net_debt = stock_dict["net_debt"]  # 순 차입금
+    cash = stock_dict["cash"]  # 현금성자산
+    
+    EV = capitalization + (net_debt - cash)
+
+    return EV
+
+# 기업 실 가치 비교 - 높으면 고평가, 낮으면 저평가 lower better
+def get_EV_div_EBITDA(stock_dict):
+    EV = stock_dict["EV"]
+    EBITDA = stock_dict["EBITDA"]
+
+    return float(EV/EBITDA)
