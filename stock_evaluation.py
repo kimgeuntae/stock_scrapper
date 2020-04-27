@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 
+def is_True(data):
+    if data:
+        return True
+    else:
+        return False
+
 def append_from_list_to_list(from_list, to_list):
     for data in from_list:
         to_list.append(data)
