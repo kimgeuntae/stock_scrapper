@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+from selenium import webdriver
 
 from stock_evaluation import is_True
 
@@ -34,5 +35,5 @@ def extract_state_financial_statement_detail(stock_number):
     soup = BeautifulSoup(result.text, "html.parser")
 
     print(soup.find_all("script"))
-    
+
     return "a"
