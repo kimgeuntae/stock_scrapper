@@ -78,7 +78,7 @@ def extract_state_financial_statement_detail(stock_number):
         28: "PER",  # PER
         29: "BPS",  # BPS
         30: "PBR",  # PBR
-        31: "cash_DPS",  # 현금DPS
+        31: "cash_DPS",  # 현금DPS - 주당 배당금
         32: "cash_dividend_yield_ratio",  # 현금배당수익률
         33: "cash_dividend_payout_ratio",  # 현금배당성향
         34: "total_stocks"  # 발행주식수(보통주) - 총 주식수 = *1000
@@ -104,8 +104,14 @@ def extract_state_financial_statement_detail(stock_number):
             # th number = 1
             if j == 1:
                 ths = tr.find_all("th")
-                # get year
-                finance_dict[titles_name[j]] = ths[i-1].contents[0].split("/")[0]
+
+                # year
+                if i < 5:
+                    finance_dict[titles_name[j]] = ths[i - 1].contents[0].split("/")[0]
+                # quarter
+                else:
+                    finance_dict[titles_name[j]] = ths[i - 1].contents[0].split("/")[1]
+                    
             else:
                 tds = tr.find_all("td")
                 finance_dict[titles_name[j]] = tds[i].string
