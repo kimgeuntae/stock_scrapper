@@ -12,16 +12,26 @@ def append_from_list_to_list(from_list, to_list):
     return to_list
 
 def is_over(type_data, type_standard):
-    if is_digit(type_data):
+    if is_digit(type_data) and is_digit(type_standard) :
         if float(type_data) >= float(type_standard):
             return True
         return False
+    else:
+        return False
+
+def is_bigger(type_standard, type_data):
+    return is_over(type_data, type_standard)
 
 def is_under(type_data, type_standard):
-    if is_digit(type_data):
+    if is_digit(type_data) and is_digit(type_standard):
         if float(type_data) <= float(type_standard):
             return True
         return False
+    else:
+        return False
+
+def is_lower(type_standard, type_data):
+    return is_under(type_data, type_standard)
 
 def is_digit(str):
     try:
@@ -135,3 +145,241 @@ def get_EV_div_EBITDA(stock_dict):
     EBITDA = stock_dict["EBITDA"]
 
     return float(EV/EBITDA)
+
+def check_low_stock(stock_list, stock_financial_dict_lists):
+    stock_price = stock_list[2]    # 주가
+    stock_capitalization = stock_list[6]  # 시가총액
+
+    year_bigger = 0  # 연도
+    quarter_bigger = 0 # 분기
+    sales_bigger = 0 # 매출액
+    business_profits_bigger = 0  # 영업이익
+    announced_business_profits_bigger = 0 # 영업이익(발표기준)
+    pre_tax_business_profits_bigger = 0  # 세전계속사업이익
+    net_income_bigger = 0  # 당기순이익
+    ruled_net_income_bigger = 0  # 당기순이익(지배)
+    not_ruled_net_income_lower = 0  # 당기순이익(비지배)
+    total_assets_bigger = 0  # 자산총계
+    total_debt_lower = 0  # 부채총계
+    total_capital_bigger = 0  # 자본총계
+    ruled_total_capital_bigger = 0  # 자본총계(지배)
+    not_ruled_total_capital_lower = 0  # 자본총계(비지배)
+    capital_bigger = 0  # 자본금
+    CFO_bigger_than_0 = 0  # 영업활동현금흐름 = 플러스면 영업 소득, 마이너스면 영업 손실
+    CFI_lower_than_0 = 0  # 투자활동현금흐름 = 마이너스이면 투자하는 것. 최대 CFO 의 50% 를 넘기지는 말자.
+    CFF_lower_than_0 = 0  # 재무활동현금흐름 = 플러스면 은행 대출, 마이너스면 은행 빛 갚거나 주주 배당.
+    CAPEX_lower = 0  # CAPEX = 자본적지출, 투자, 개발, 토지 등 기업이 사용한 금액.
+    FCF_bigger = 0  # FCF = 잉여현금흐름, 기업이 사용후 남은 돈.
+    interest_debt_lower = 0  # 이자발생부채
+    operating_profits_ratio_bigger = 0  # 영업이익률
+    net_profit_ratio_bigger = 0  # 순이익률
+    ROE_bigger = 0  # ROE
+    ROA_bigger = 0  # ROA
+    debt_ratio_lower = 0  # 부채비율
+    capital_reserve_ratio_bigger = 0  # 자본유보율
+    EPS_bigger = 0  # EPS
+    PER_lower = 0  # PER
+    BPS_bigger = stock_price  # BPS = bigger_than_stock_price
+    PBR_lower_than_1 = 1  # PBR
+    cash_DPS_better_big = 0  # 현금DPS = 주당 배당금
+    cash_dividend_yield_ratio_bigger = 0  # 현금배당수익률
+    cash_dividend_payout_ratio_bigger = 0  # 현금배당성향
+    total_stocks = stock_list[7]  # 발행주식수(보통주) = 총 주식수
+    
+    for stock_financial_dict in stock_financial_dict_lists:
+        # check date
+        if year_bigger <= float(stock_financial_dict.get("year")):
+            year_bigger = float(stock_financial_dict.get("year"))
+        elif quarter_bigger <= float(stock_financial_dict.get("quarter")):
+            quarter_bigger = float(stock_financial_dict.get("quarter"))
+        else:
+            return False
+        
+        # check sales
+        if is_bigger(sales_bigger, float(stock_financial_dict.get("sales"))):
+            sales_bigger = float(stock_financial_dict.get("sales"))
+        else:
+            return False
+        
+        # check business_profits
+        if is_bigger(business_profits_bigger, float(stock_financial_dict.get("business_profits"))):
+            business_profits_bigger = float(stock_financial_dict.get("business_profits"))
+        else:
+            return False
+        
+        # check announced_business_profits
+        if is_bigger(announced_business_profits_bigger, float(stock_financial_dict.get("announced_business_profits"))):
+            announced_business_profits_bigger = float(stock_financial_dict.get("announced_business_profits"))
+        else:
+            return False
+
+        # check pre_tax_business_profits
+        if is_bigger(pre_tax_business_profits_bigger, float(stock_financial_dict.get("pre_tax_business_profits"))):
+            pre_tax_business_profits_bigger = float(stock_financial_dict.get("pre_tax_business_profits"))
+        else:
+            return False
+
+        # check net_income
+        if is_bigger(net_income_bigger, float(stock_financial_dict.get("net_income"))):
+            net_income_bigger = float(stock_financial_dict.get("net_income"))
+        else:
+            return False
+            
+        # check ruled_net_income
+        if is_bigger(ruled_net_income_bigger, float(stock_financial_dict.get("ruled_net_income"))):
+            ruled_net_income_bigger = float(stock_financial_dict.get("ruled_net_income"))
+        else:
+            return False
+
+        # check not_ruled_net_income
+        if is_lower(float(stock_financial_dict.get("not_ruled_net_income")), not_ruled_net_income_lower):
+            not_ruled_net_income_lower = float(stock_financial_dict.get("not_ruled_net_income"))
+        else:
+            return False
+        
+        # check total_assets
+        if is_bigger(total_assets_bigger, float(stock_financial_dict.get("total_assets"))):
+            total_assets_bigger = float(stock_financial_dict.get("total_assets"))
+        else:
+            return False
+
+        # check total_debt
+        if is_lower(float(stock_financial_dict.get("total_debt")), total_debt_lower):
+            total_debt_lower = float(stock_financial_dict.get("total_debt"))
+        else:
+            return False
+
+        # check total_capital
+        if is_bigger(total_capital_bigger, float(stock_financial_dict.get("total_capital"))):
+            total_capital_bigger = float(stock_financial_dict.get("total_capital"))
+        else:
+            return False
+        
+        # check ruled_total_capital
+        if is_bigger(ruled_total_capital_bigger, float(stock_financial_dict.get("ruled_total_capital"))):
+            ruled_total_capital_bigger = float(stock_financial_dict.get("ruled_total_capital"))
+        else:
+            return False
+        
+        # check not_ruled_total_capital
+        if is_lower(float(stock_financial_dict.get("not_ruled_total_capital")), not_ruled_total_capital_lower):
+            not_ruled_total_capital_lower = float(stock_financial_dict.get("not_ruled_total_capital"))
+        else:
+            return False
+        
+        # check capital
+        if is_bigger(capital_bigger, float(stock_financial_dict.get("capital"))):
+            capital_bigger = float(stock_financial_dict.get("capital"))
+        else:
+            return False
+
+        # check CFO
+        if not(is_bigger(CFO_bigger_than_0, float(stock_financial_dict.get("CFO")))):
+            return False
+
+        # check CFI
+        if not(is_lower(CFI_lower_than_0, float(stock_financial_dict.get("CFI")))):
+            return False
+        
+        # check CFF
+        if not(is_lower(CFF_lower_than_0, float(stock_financial_dict.get("CFF")))):
+            return False
+
+        # check CAPEX
+        if is_lower(float(stock_financial_dict.get("CAPEX")), CAPEX_lower):
+            CAPEX_lower = float(stock_financial_dict.get("CAPEX"))
+        else:
+            return False
+        
+        # check FCF
+        if is_bigger(FCF_bigger, float(stock_financial_dict.get("FCF"))):
+            FCF_bigger = float(stock_financial_dict.get("FCF"))
+        else:
+            return False
+        
+        # check interest_debt
+        if is_lower(float(stock_financial_dict.get("interest_debt")), interest_debt_lower):
+            interest_debt_lower = float(stock_financial_dict.get("interest_debt"))
+        else:
+            return False
+        
+        # check operating_profits_ratio
+        if is_bigger(operating_profits_ratio_bigger, float(stock_financial_dict.get("operating_profits_ratio"))):
+            operating_profits_ratio_bigger = float(stock_financial_dict.get("operating_profits_ratio"))
+        else:
+            return False
+        
+        # check net_profit_ratio
+        if is_bigger(net_profit_ratio_bigger, float(stock_financial_dict.get("net_profit_ratio"))):
+            net_profit_ratio_bigger = float(stock_financial_dict.get("net_profit_ratio"))
+        else:
+            return False
+        
+        # check ROE
+        if is_bigger(ROE_bigger, float(stock_financial_dict.get("ROE"))):
+            ROE_bigger = float(stock_financial_dict.get("ROE"))
+        else:
+            return False
+        
+        # check ROA
+        if is_bigger(ROA_bigger, float(stock_financial_dict.get("ROA"))):
+            ROA_bigger = float(stock_financial_dict.get("ROA"))
+        else:
+            return False
+        
+        # check debt_ratio
+        if is_lower(float(stock_financial_dict.get("debt_ratio")), debt_ratio_lower):
+            debt_ratio_lower = float(stock_financial_dict.get("debt_ratio"))
+        else:
+            return False
+        
+        # check capital_reserve_ratio
+        if is_bigger(capital_reserve_ratio_bigger, float(stock_financial_dict.get("capital_reserve_ratio"))):
+            capital_reserve_ratio_bigger = float(stock_financial_dict.get("capital_reserve_ratio"))
+        else:
+            return False
+        
+        # check EPS
+        if is_bigger(EPS_bigger, float(stock_financial_dict.get("EPS"))):
+            EPS_bigger = float(stock_financial_dict.get("EPS"))
+        else:
+            return False
+
+        # check PER
+        if is_lower(float(stock_financial_dict.get("PER")), PER_lower):
+            PER_lower = float(stock_financial_dict.get("PER"))
+        else:
+            return False
+
+        # check BPS
+        if is_bigger(BPS_bigger, float(stock_financial_dict.get("BPS"))):
+            BPS_bigger = float(stock_financial_dict.get("BPS"))
+        else:
+            return False
+
+        # check PBR
+        if not(is_lower(PBR_lower_than_1, float(stock_financial_dict.get("PBR")))):
+            return False
+
+        # check cash_DPS
+        if is_bigger(cash_DPS_better_big, float(stock_financial_dict.get("cash_DPS"))):
+            cash_DPS_better_big = float(stock_financial_dict.get("cash_DPS"))
+        else:
+            return False
+
+        # check cash_dividend_yield_ratio
+        if is_bigger(cash_dividend_yield_ratio_bigger, float(stock_financial_dict.get("cash_dividend_yield_ratio"))):
+            cash_dividend_yield_ratio_bigger = float(stock_financial_dict.get("cash_dividend_yield_ratio"))
+        else:
+            return False
+        
+        # check cash_dividend_payout_ratio
+        if is_bigger(cash_dividend_payout_ratio_bigger, float(stock_financial_dict.get("cash_dividend_payout_ratio"))):
+            cash_dividend_payout_ratio_bigger = float(stock_financial_dict.get("cash_dividend_payout_ratio"))
+        else:
+            return False
+
+    return True
+        
+        
+        

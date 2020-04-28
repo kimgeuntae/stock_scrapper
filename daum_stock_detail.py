@@ -32,6 +32,9 @@ def is_company(stock_number):
 def extract_state_financial_statement_detail(stock_number):
     STATE_FINANCIAL_STATEMENT_DETAIL_URL = f"https://wisefn.finance.daum.net/v1/company/cF1001.aspx?cmp_cd={stock_number}&finGubun=MAIN"
     
+    print("FUNCTION: [extract_state_financial_statement_detail]")
+    print(f"https://wisefn.finance.daum.net/v1/company/cF1001.aspx?cmp_cd={stock_number}&finGubun=MAIN")
+    
     # selenium
     driver_path = "./chrome_driver/chromedriver"
     browser = webdriver.Chrome(driver_path)
@@ -81,7 +84,8 @@ def extract_state_financial_statement_detail(stock_number):
         31: "cash_DPS",  # 현금DPS - 주당 배당금
         32: "cash_dividend_yield_ratio",  # 현금배당수익률
         33: "cash_dividend_payout_ratio",  # 현금배당성향
-        34: "total_stocks"  # 발행주식수(보통주) - 총 주식수 = *1000
+        34: "total_stocks",  # 발행주식수(보통주) - 총 주식수 = *1000
+        35: "quarter"   # 분기
     }
 
     # get finance division , year, quarter
@@ -107,14 +111,30 @@ def extract_state_financial_statement_detail(stock_number):
 
                 # year
                 if i < 5:
-                    finance_dict[titles_name[j]] = ths[i - 1].contents[0].split("/")[0]
+                    check_empty_list = ths[i - 1].contents
+                    
+                    # empty year check
+                    if not check_empty_list:
+                        finance_dict[titles_name[j]] = 0
+                    else:
+                        finance_dict[titles_name[j]] = ths[i - 1].contents[0].split("/")[0]
                 # quarter
                 else:
-                    finance_dict[titles_name[j]] = ths[i - 1].contents[0].split("/")[1]
-                    
+                    check_empty_list = ths[i - 1].contents
+
+                    # empty quarter check
+                    if not check_empty_list:
+                        finance_dict[titles_name[35]] = 0    # no data = 0
+                    else:
+                        finance_dict[titles_name[35]] = ths[i - 1].contents[0].split("/")[1]
+
             else:
                 tds = tr.find_all("td")
-                finance_dict[titles_name[j]] = tds[i].string
+                if None == tds[i].string:
+                    # finance_dict[titles_name[j]] = tds[i].string
+                    finance_dict[titles_name[j]] = 0    # nonetype 대신 0
+                else:
+                    finance_dict[titles_name[j]] = tds[i].string.replace(",", "")
 
         if i < 5:
             temp_year_list.append(finance_dict)
