@@ -55,16 +55,16 @@ def get_PER(stock_price, eps):
 # BPS : 주당 순자산 - 클 수록 좋음 bigger better
 def get_BPS(stock_dict):
     # public_BPS = stock_dict["BPS"]
-    # simple_BPS = (total_amount_capital + capital) / total_stocks
+    # simple_BPS = (total_capital + capital) / total_stocks
 
     # profit
-    total_amount_capital = stock_dict["total_amount_capital"]   # 자본 총계
+    total_capital = stock_dict["total_capital"]   # 자본총계
     capital = stock_dict["capital"] # 자본금
     business_income = stock_dict["business_income"] # 영업이익
     current_net_income = stock_dict["current_net_income"]   # 당기순이익
     FCF = stock_dict["FCF"] # 투자금
 
-    profit = total_amount_capital + capital + business_income + current_net_income + FCF
+    profit = total_capital + capital + business_income + current_net_income + FCF
 
     # deficit
     CFO = stock_dict["CFO"] # 영업활동현금흐름
@@ -88,7 +88,7 @@ def get_PBR(stock_price, BPS):
     return calc_PBR
 
 # 부채비율
-def get_debt_percent(stock_dict, debt_standard):
+def get_debt_ratio(stock_dict, debt_standard):
     # profit
     total_assets = stock_dict["total_assets"]  # 자산총계
     capital = stock_dict["capital"]  # 자본금
@@ -103,9 +103,9 @@ def get_debt_percent(stock_dict, debt_standard):
 
     deficit = total_debt + CAPEX + interest_debt
 
-    debt_percent = get_part_percent(profit, deficit)
+    debt_ratio = get_part_percent(profit, deficit)
     
-    if is_over(debt_percent, debt_standard):    # 부채비율이 기준비율보다 높은지
+    if is_over(debt_ratio, debt_standard):    # 부채비율이 기준비율보다 높은지
         return False    # 높으면 제외.
     else:
         return True
