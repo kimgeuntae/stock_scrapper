@@ -1,3 +1,4 @@
+import time
 import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -30,10 +31,26 @@ def is_company(stock_number):
 # extract state_financial_statement
 def extract_state_financial_statement_detail(stock_number):
     STATE_FINANCIAL_STATEMENT_DETAIL_URL = f"https://wisefn.finance.daum.net/v1/company/cF1001.aspx?cmp_cd={stock_number}&finGubun=MAIN"
-        
-    result = requests.get(STATE_FINANCIAL_STATEMENT_DETAIL_URL)
-    soup = BeautifulSoup(result.text, "html.parser")
+    
+    # selenium
+    driver_path = "./chrome_driver/chromedriver"
+    browser = webdriver.Chrome(driver_path)
+    browser.get(STATE_FINANCIAL_STATEMENT_DETAIL_URL)
+    time.sleep(1)
 
-    print(soup.find_all("script"))
+    html = browser.page_source
 
+    soup = BeautifulSoup(html, "html.parser")
+    browser.quit()
+
+    table = soup.find("table")
+    tbody = table.find("tbody")
+
+    trs = []
+
+    for i in range(0, 28):
+        trs.append(tbody.find("tr", {"class": f"row{i}"}))
+
+    print(trs)
+    
     return "a"
