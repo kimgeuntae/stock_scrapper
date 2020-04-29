@@ -68,8 +68,8 @@ def extract_state_financial_statement_detail(stock_number):
         15: "CFO",  # 영업활동현금흐름
         16: "CFI",  # 투자활동현금흐름
         17: "CFF",  # 재무활동현금흐름
-        18: "CAPEX",  # CAPEX
-        19: "FCF",  # FCF
+        18: "CAPEX",  # CAPEX = 자본적지출, 설비 등 투자비용.
+        19: "FCF",  # FCF   = 잉여자금 , CFI + CFF - CAPEX
         20: "interest_debt",  # 이자발생부채
         21: "operating_profits_ratio",  # 영업이익률
         22: "net_profit_ratio",  # 순이익률

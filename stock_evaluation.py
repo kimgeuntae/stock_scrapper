@@ -158,7 +158,7 @@ def check_low_stock(stock_list, stock_financial_dict_lists):
     pre_tax_business_profits_bigger = 0  # 세전계속사업이익
     net_income_bigger = 0  # 당기순이익
     ruled_net_income_bigger = 0  # 당기순이익(지배)
-    not_ruled_net_income_lower = 0  # 당기순이익(비지배)
+    not_ruled_net_income_lower = 0  # 당기순이익(비지배), 당기순이익의 3%이하.
     total_assets_bigger = 0  # 자산총계
     total_debt_lower = 0  # 부채총계
     total_capital_bigger = 0  # 자본총계
@@ -173,12 +173,12 @@ def check_low_stock(stock_list, stock_financial_dict_lists):
     interest_debt_lower = 0  # 이자발생부채
     operating_profits_ratio_bigger = 0  # 영업이익률
     net_profit_ratio_bigger = 0  # 순이익률
-    ROE_bigger = 0  # ROE
+    ROE_bigger = 5  # ROE
     ROA_bigger = 0  # ROA
-    debt_ratio_lower = 0  # 부채비율
+    debt_ratio_lower = 130  # 부채비율
     capital_reserve_ratio_bigger = 0  # 자본유보율
     EPS_bigger = 0  # EPS
-    PER_lower = 0  # PER
+    PER_lower = 10  # PER
     BPS_bigger = stock_price  # BPS = bigger_than_stock_price
     PBR_lower_than_1 = 1  # PBR
     cash_DPS_better_big = 0  # 현금DPS = 주당 배당금
@@ -232,6 +232,9 @@ def check_low_stock(stock_list, stock_financial_dict_lists):
             return False
 
         # check not_ruled_net_income
+        if not_ruled_net_income_lower == 0:
+            not_ruled_net_income_lower = float(stock_financial_dict.get("net_income"))
+
         if is_lower(float(stock_financial_dict.get("not_ruled_net_income")), not_ruled_net_income_lower):
             not_ruled_net_income_lower = float(stock_financial_dict.get("not_ruled_net_income"))
         else:
@@ -244,6 +247,9 @@ def check_low_stock(stock_list, stock_financial_dict_lists):
             return False
 
         # check total_debt
+        if total_debt_lower == 0:
+            total_debt_lower = float(stock_financial_dict.get("total_capital"))
+
         if is_lower(float(stock_financial_dict.get("total_debt")), total_debt_lower):
             total_debt_lower = float(stock_financial_dict.get("total_debt"))
         else:
@@ -262,6 +268,9 @@ def check_low_stock(stock_list, stock_financial_dict_lists):
             return False
         
         # check not_ruled_total_capital
+        if not_ruled_total_capital_lower == 0:
+            not_ruled_total_capital_lower = float(stock_financial_dict.get("ruled_total_capital"))
+
         if is_lower(float(stock_financial_dict.get("not_ruled_total_capital")), not_ruled_total_capital_lower):
             not_ruled_total_capital_lower = float(stock_financial_dict.get("not_ruled_total_capital"))
         else:
@@ -286,6 +295,9 @@ def check_low_stock(stock_list, stock_financial_dict_lists):
             return False
 
         # check CAPEX
+        if CAPEX_lower == 0:
+            CAPEX_lower = float(stock_financial_dict.get("FCF"))
+
         if is_lower(float(stock_financial_dict.get("CAPEX")), CAPEX_lower):
             CAPEX_lower = float(stock_financial_dict.get("CAPEX"))
         else:
@@ -298,6 +310,9 @@ def check_low_stock(stock_list, stock_financial_dict_lists):
             return False
         
         # check interest_debt
+        if interest_debt_lower == 0:
+            interest_debt_lower = float(stock_financial_dict.get("CFO"))
+
         if is_lower(float(stock_financial_dict.get("interest_debt")), interest_debt_lower):
             interest_debt_lower = float(stock_financial_dict.get("interest_debt"))
         else:
