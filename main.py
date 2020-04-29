@@ -5,107 +5,144 @@ from naver_stocks_list import extract_stock_list_tbody, extract_stock_list_thead
 from save import save_list_to_file
 from stock_evaluation import is_over, is_under, check_low_stock
 from daum_stock_detail import extract_stock_detail_dict
+
 PRICE_STANDARD = 100000   # 현재가
 DIFF_STANDARD = []    # 전일비
 FLUC_STANDARD = []    # 등락률
 PAR_STANDARD = []  # 액면가
-CAPITALIZATION_STANDARD = 0  # 시가총액
+KOSPI_CAPITALIZATION_STANDARD = 1500	  # KOSPI 시가총액
+KOSDAQ_CAPITALIZATION_STANDARD = 350  # KOSDAQ 시가총액
 TOTAL_STOCKS_STANDARD = []   # 상장 주식수
 FOREIGN_STANDARD = [] # 외국인 비율
 VOLUME_STANDARD = []  # 거래량
 PER_STANDARD = 10     # PER
 ROE_STANDARD = 5  # ROE
 
-MAX_PAGE_NUM = 32
-STOCK_LIST_URL = "https://finance.naver.com/sise/sise_market_sum.nhn?sosok=0&page=" # stock number
+KOSPI = 0
+KOSDAQ = 1
 
-STOCK_FUNDAMENTAL_URL = "https://finance.naver.com/item/coinfo.nhn?code="   # stock number
+KOSPI_MAX_PAGE_NUM = 32
+KOSDAQ_MAX_PAGE_NUM = 29
+
+KOSPI_STOCK_LIST_URL = f"https://finance.naver.com/sise/sise_market_sum.nhn?sosok={KOSPI}&page="
+KOSDAQ_STOCK_LIST_URL = f"https://finance.naver.com/sise/sise_market_sum.nhn?sosok={KOSDAQ}&page="
 
 TODAY = datetime.today().strftime("%Y%m%d")
 CSV_FORDER = "rank_csv"
 FILE_FORMAT = "csv"
-FNAME_CAPITALIZATION_RANK = f"{TODAY}_capitalization_rank"
-FNAME_LOW_VALUATION_LIST = f"{TODAY}_low_valuation_list"
-FNAME_ACCEPTED_PER_ROE_LIST = f"{TODAY}_accepted_PER_ROE_list"
-FNAME_CAPI_OVER_STANDARD_STOCKS = f"{TODAY}_capi_over_{CAPITALIZATION_STANDARD}_stocks"
 
-capi_rank_stocks_table = []
-low_value_list = []
-
-capi_rank_thead = extract_stock_list_thead(f"{STOCK_LIST_URL}{1}")
-capi_rank_tbody = []
-
-capi_rank_stocks_table.append(capi_rank_thead)
-low_value_list.append(capi_rank_thead)
-
-low_stocks_list = []
-temp_stocks_list = []
-
-temp_list = []
-
-# build capi_rank_stocks_table
-for n in range(MAX_PAGE_NUM):
-    URL = f"{STOCK_LIST_URL}{n+1}"
-
-    # extract stock list tbody
-    for tbody_data in extract_stock_list_tbody(URL):
-        capi_rank_tbody.append(tbody_data)
-        capi_rank_stocks_table.append(tbody_data)
-
-########### SAVE CAPITALIZATION_RANK ###########
-save_list_to_file(f"{CSV_FORDER}/{FNAME_CAPITALIZATION_RANK}.{FILE_FORMAT}", capi_rank_stocks_table)
+FNAME_CAPITALIZATION_RANK = f"capitalization_rank"
+FNAME_LOW_VALUATION_LIST = f"low_valuation_list"
+FNAME_ACCEPTED_PER_ROE_LIST = f"accepted_PER_ROE_list"
 
 
-# build capi_over_standard_stocks
-temp_stocks_list.append(capi_rank_thead)
-
-for stock in capi_rank_tbody:
-    temp_capi = stock[6].replace(",","")
-    if is_over(temp_capi, CAPITALIZATION_STANDARD):
-        temp_list.append(stock)
-        temp_stocks_list.append(stock)
-
-########### SAVE CAPI_OVER_STANDARD_STOCKS ###########
-save_list_to_file(f"{CSV_FORDER}/{FNAME_CAPI_OVER_STANDARD_STOCKS}.{FILE_FORMAT}", temp_stocks_list)
+def extract_stock_thead(URL):
+    stock_thead = extract_stock_list_thead(f"{URL}{1}")
+    return stock_thead
 
 
-# build accept_PER_ROE_LIST
-temp_stocks_list.clear()
-temp_stocks_list.append(capi_rank_thead)
+def extract_stock_capitalization_rank(URL, max_page_num):
+    capi_rank_stocks = []
+    capi_rank_stocks.append(extract_stock_thead(URL))
 
-for stock in temp_list:
-    temp_PER = stock[10].replace(",", "")
-    temp_ROE = stock[11].replace(",", "")
+    # build capi_rank_stocks_table
+    for n in range(max_page_num):
+        tenmp_URL = f"{URL}{n+1}"
+        # extract stock list tbody
+        for tbody_data in extract_stock_list_tbody(tenmp_URL):
+            capi_rank_stocks.append(tbody_data)
+
+    return capi_rank_stocks
+
+
+def extract_over_capi_standard_stocks(temp_stocks_list, capi_standard):
+    over_capi_standard_stocks = []
+    over_capi_standard_stocks.append(temp_stocks_list[0])
+
+    tbody = temp_stocks_list[1:-1]
+
+    # build over_capi_standard_stocks
+    for stock in tbody:
+        temp_capi = stock[6].replace(",","")
+        if is_over(temp_capi, capi_standard):
+            over_capi_standard_stocks.append(stock)
     
-    if is_under(temp_PER, PER_STANDARD):
-        if is_over(temp_ROE, ROE_STANDARD):
-            temp_stocks_list.append(stock)
-
-temp_list = temp_stocks_list[1:-1]
-
-print(f"{FNAME_ACCEPTED_PER_ROE_LIST} : {len(temp_list)}")
-########### SAVE accepted PER, ROE ###########
-save_list_to_file(f"{CSV_FORDER}/{FNAME_ACCEPTED_PER_ROE_LIST}.{FILE_FORMAT}", temp_stocks_list)
+    return over_capi_standard_stocks
 
 
-# build low_stock_list
-low_stocks_list.append(capi_rank_thead)
+def extract_accept_PER_ROE_list(temp_stocks_list):
+    accept_PER_ROE_stocks = []
+    accept_PER_ROE_stocks.append(temp_stocks_list[0])
 
-for idx, stock in enumerate(temp_list):
-    # get index, value from enumerate
-    print(idx+1, stock[1])
-    temp_stock_dict = extract_stock_detail_dict(stock[-1])
+    tbody = temp_stocks_list[1:-1]
+
+    # build accept_PER_ROE_LIST
+    for stock in tbody:
+        temp_PER = stock[10].replace(",", "")
+        temp_ROE = stock[11].replace(",", "")
+        
+        if is_under(temp_PER, PER_STANDARD):
+            if is_over(temp_ROE, ROE_STANDARD):
+                accept_PER_ROE_stocks.append(stock)
+
+    print(f"{FNAME_ACCEPTED_PER_ROE_LIST} : {len(accept_PER_ROE_stocks)-1}")
+    return accept_PER_ROE_stocks
     
-    if check_low_stock(stock, temp_stock_dict["year_financial"]):
-        if check_low_stock(stock, temp_stock_dict["quarter_financial"]):
-            low_stocks_list.append(stock)
+
+def extract_accepted_low_value_stocks(temp_stocks_list):
+    low_stocks_list = []
+    low_stocks_list.append(temp_stocks_list[0])
+    
+    tbody = temp_stocks_list[1:-1]
+
+    # build low_stock_list
+    for idx, stock in enumerate(tbody):
+        # get index, value from enumerate
+        print(idx+1, stock[1])
+        temp_stock_dict = extract_stock_detail_dict(stock[-1])
+        
+        if check_low_stock(stock, temp_stock_dict["year_financial"]):
+            if check_low_stock(stock, temp_stock_dict["quarter_financial"]):
+                low_stocks_list.append(stock)
+            else:
+                print("Not Accept")
         else:
-            print("Not Accept")
+                print("Not Accept")
+
+    return low_stocks_list
+
+
+def extract_low_value_stock(stock_kind_num):
+    if stock_kind_num == 0:
+        stock_kind_name = "KOSPI"
+        STOCK_LIST_URL = KOSPI_STOCK_LIST_URL
+        capi_standard = KOSPI_CAPITALIZATION_STANDARD
+        FNAME_CAPI_OVER_STANDARD_STOCKS = f"capi_over_{capi_standard}_stocks"
+        max_page_num = KOSPI_MAX_PAGE_NUM
+
+    elif stock_kind_num == 1:
+        stock_kind_name = "KOSDAQ"
+        STOCK_LIST_URL = KOSDAQ_STOCK_LIST_URL
+        capi_standard = KOSDAQ_CAPITALIZATION_STANDARD
+        FNAME_CAPI_OVER_STANDARD_STOCKS = f"capi_over_{capi_standard}_stocks"
+        max_page_num = KOSDAQ_MAX_PAGE_NUM
+
     else:
-            print("Not Accept")
+        print("Error: extract_stock_capitalization_rank")
+        return False
+    
+    stocks_capi_rank = extract_stock_capitalization_rank(STOCK_LIST_URL, max_page_num)
+    save_list_to_file(f"{CSV_FORDER}/{TODAY}_{stock_kind_name}_{FNAME_CAPITALIZATION_RANK}.{FILE_FORMAT}", stocks_capi_rank)
 
-########### SAVE checked low stock list ###########
-save_list_to_file(f"{CSV_FORDER}/{FNAME_LOW_VALUATION_LIST}.{FILE_FORMAT}", low_stocks_list)
+    stocks_capi_over_rank = extract_over_capi_standard_stocks(stocks_capi_rank, capi_standard)
+    save_list_to_file(f"{CSV_FORDER}/{TODAY}_{stock_kind_name}_{FNAME_CAPI_OVER_STANDARD_STOCKS}.{FILE_FORMAT}", stocks_capi_over_rank)
 
+    stocks_accept_PER_ROE = extract_accept_PER_ROE_list(stocks_capi_over_rank)
+    save_list_to_file(f"{CSV_FORDER}/{TODAY}_{stock_kind_name}_{FNAME_ACCEPTED_PER_ROE_LIST}.{FILE_FORMAT}", stocks_accept_PER_ROE)
 
+    stocks_accepted_low_value = extract_accepted_low_value_stocks(stocks_accept_PER_ROE)
+    save_list_to_file(f"{CSV_FORDER}/{TODAY}_{stock_kind_name}_{FNAME_LOW_VALUATION_LIST}.{FILE_FORMAT}", stocks_accepted_low_value)
 
+# Extract!
+# extract_low_value_stock(KOSPI)
+extract_low_value_stock(KOSDAQ)
