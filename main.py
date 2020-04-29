@@ -9,7 +9,7 @@ PRICE_STANDARD = 100000   # 현재가
 DIFF_STANDARD = []    # 전일비
 FLUC_STANDARD = []    # 등락률
 PAR_STANDARD = []  # 액면가
-CAPITALIZATION_STANDARD = 2000  # 시가총액
+CAPITALIZATION_STANDARD = 0  # 시가총액
 TOTAL_STOCKS_STANDARD = []   # 상장 주식수
 FOREIGN_STANDARD = [] # 외국인 비율
 VOLUME_STANDARD = []  # 거래량
@@ -99,6 +99,10 @@ for idx, stock in enumerate(temp_list):
     if check_low_stock(stock, temp_stock_dict["year_financial"]):
         if check_low_stock(stock, temp_stock_dict["quarter_financial"]):
             low_stocks_list.append(stock)
+        else:
+            print("Not Accept")
+    else:
+            print("Not Accept")
 
 ########### SAVE checked low stock list ###########
 save_list_to_file(f"{CSV_FORDER}/{FNAME_LOW_VALUATION_LIST}.{FILE_FORMAT}", low_stocks_list)
