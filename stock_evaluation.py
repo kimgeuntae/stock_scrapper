@@ -40,11 +40,12 @@ def is_digit(str):
     except ValueError:
         return False
 
-def is_near_percent(percent, standard_num, new_num):
-    temp_num = standard_num - new_num
-    temp_percent = new_num / temp_num * 100
+def is_inner_percent_next(percent_standard, standard_num, next_num):
+    # 절대값으로 계산 Absolute
+    temp_num = abs(next_num) - abs(standard_num)
+    temp_percent = abs(temp_num) / abs(standard_num) * 100
 
-    if percent > temp_percent:
+    if percent_standard > abs(temp_percent):
         return True
     return False
 
@@ -155,7 +156,7 @@ def check_low_stock(stock_list, stock_financial_dict_lists):
     sales_bigger = 0 # 매출액
     business_profits_bigger = 0  # 영업이익
     announced_business_profits_bigger = 0 # 영업이익(발표기준)
-    pre_tax_business_profits_bigger = 0  # 세전계속사업이익
+    pre_tax_business_profits_bigger_than_1 = 1  # 세전계속사업이익
     net_income_bigger = 0  # 당기순이익
     ruled_net_income_bigger = 0  # 당기순이익(지배)
     not_ruled_net_income_lower = 0  # 당기순이익(비지배), 당기순이익의 3%이하.
@@ -179,8 +180,8 @@ def check_low_stock(stock_list, stock_financial_dict_lists):
     capital_reserve_ratio_bigger = 0  # 자본유보율
     EPS_bigger = 0  # EPS
     PER_lower = 10  # PER
-    BPS_bigger = stock_price  # BPS = bigger_than_stock_price
-    PBR_lower_than_1 = 1  # PBR
+    BPS_bigger = float(stock_price.replace(",", ""))  # BPS = bigger_than_stock_price
+    PBR_lower_than_2 = 2  # PBR
     cash_DPS_better_big = 0  # 현금DPS = 주당 배당금
     cash_dividend_yield_ratio_bigger = 0  # 현금배당수익률
     cash_dividend_payout_ratio_bigger = 0  # 현금배당성향
@@ -196,88 +197,122 @@ def check_low_stock(stock_list, stock_financial_dict_lists):
             return False
         
         # check sales
-        if is_bigger(sales_bigger, float(stock_financial_dict.get("sales"))):
+        if sales_bigger == 0:
+            sales_bigger = float(stock_financial_dict.get("sales"))
+        elif is_bigger(sales_bigger, float(stock_financial_dict.get("sales"))):
             sales_bigger = float(stock_financial_dict.get("sales"))
         else:
             return False
         
         # check business_profits
-        if is_bigger(business_profits_bigger, float(stock_financial_dict.get("business_profits"))):
+        if business_profits_bigger == 0:
+            business_profits_bigger = float(stock_financial_dict.get("business_profits"))
+        elif is_bigger(business_profits_bigger, float(stock_financial_dict.get("business_profits"))):
             business_profits_bigger = float(stock_financial_dict.get("business_profits"))
         else:
             return False
         
         # check announced_business_profits
-        if is_bigger(announced_business_profits_bigger, float(stock_financial_dict.get("announced_business_profits"))):
-            announced_business_profits_bigger = float(stock_financial_dict.get("announced_business_profits"))
-        else:
-            return False
+        # if announced_business_profits_bigger == 0:
+        #     announced_business_profits_bigger = float(stock_financial_dict.get("announced_business_profits"))
+        # elif is_bigger(announced_business_profits_bigger, float(stock_financial_dict.get("announced_business_profits"))):
+        #     announced_business_profits_bigger = float(stock_financial_dict.get("announced_business_profits"))
+        # else:
+        #     return False
 
         # check pre_tax_business_profits
-        if is_bigger(pre_tax_business_profits_bigger, float(stock_financial_dict.get("pre_tax_business_profits"))):
-            pre_tax_business_profits_bigger = float(stock_financial_dict.get("pre_tax_business_profits"))
-        else:
+        if not(is_bigger(pre_tax_business_profits_bigger_than_1, float(stock_financial_dict.get("pre_tax_business_profits")))):
             return False
 
         # check net_income
-        if is_bigger(net_income_bigger, float(stock_financial_dict.get("net_income"))):
+        if net_income_bigger == 0:
+            net_income_bigger = float(stock_financial_dict.get("net_income"))
+        elif is_bigger(net_income_bigger, float(stock_financial_dict.get("net_income"))):
+            net_income_bigger = float(stock_financial_dict.get("net_income"))
+        elif is_inner_percent_next(5, net_income_bigger, float(stock_financial_dict.get("net_income"))):
             net_income_bigger = float(stock_financial_dict.get("net_income"))
         else:
             return False
             
         # check ruled_net_income
-        if is_bigger(ruled_net_income_bigger, float(stock_financial_dict.get("ruled_net_income"))):
+        if ruled_net_income_bigger == 0:
+            ruled_net_income_bigger = float(stock_financial_dict.get("ruled_net_income"))
+        elif is_bigger(ruled_net_income_bigger, float(stock_financial_dict.get("ruled_net_income"))):
+            ruled_net_income_bigger = float(stock_financial_dict.get("ruled_net_income"))
+        elif is_inner_percent_next(5, ruled_net_income_bigger, float(stock_financial_dict.get("ruled_net_income"))):
             ruled_net_income_bigger = float(stock_financial_dict.get("ruled_net_income"))
         else:
             return False
 
         # check not_ruled_net_income
         if not_ruled_net_income_lower == 0:
-            not_ruled_net_income_lower = float(stock_financial_dict.get("net_income"))
-
-        if is_lower(float(stock_financial_dict.get("not_ruled_net_income")), not_ruled_net_income_lower):
+            not_ruled_net_income_lower = float(stock_financial_dict.get("not_ruled_net_income"))
+        elif is_lower(float(stock_financial_dict.get("not_ruled_net_income")), not_ruled_net_income_lower):
+            not_ruled_net_income_lower = float(stock_financial_dict.get("not_ruled_net_income"))
+        elif is_inner_percent_next(5, not_ruled_net_income_lower, float(stock_financial_dict.get("not_ruled_net_income"))):
             not_ruled_net_income_lower = float(stock_financial_dict.get("not_ruled_net_income"))
         else:
             return False
         
         # check total_assets
-        if is_bigger(total_assets_bigger, float(stock_financial_dict.get("total_assets"))):
+        if total_assets_bigger == 0:
+            total_assets_bigger = float(stock_financial_dict.get("total_assets"))
+        elif is_bigger(total_assets_bigger, float(stock_financial_dict.get("total_assets"))):
+            total_assets_bigger = float(stock_financial_dict.get("total_assets"))
+        elif is_inner_percent_next(5, total_assets_bigger, float(stock_financial_dict.get("total_assets"))):
             total_assets_bigger = float(stock_financial_dict.get("total_assets"))
         else:
             return False
 
         # check total_debt
         if total_debt_lower == 0:
-            total_debt_lower = float(stock_financial_dict.get("total_capital"))
-
-        if is_lower(float(stock_financial_dict.get("total_debt")), total_debt_lower):
+            total_debt_lower = float(stock_financial_dict.get("total_debt"))
+        elif is_lower(float(stock_financial_dict.get("total_debt")), total_debt_lower):
+            total_debt_lower = float(stock_financial_dict.get("total_debt"))
+        elif is_lower(float(stock_financial_dict.get("total_debt")), float(stock_financial_dict.get("total_capital"))):
             total_debt_lower = float(stock_financial_dict.get("total_debt"))
         else:
             return False
 
         # check total_capital
-        if is_bigger(total_capital_bigger, float(stock_financial_dict.get("total_capital"))):
+        if total_capital_bigger == 0:
+            total_capital_bigger = float(stock_financial_dict.get("total_capital"))
+        elif is_bigger(total_capital_bigger, float(stock_financial_dict.get("total_capital"))):
+            total_capital_bigger = float(stock_financial_dict.get("total_capital"))
+        elif is_inner_percent_next(5, total_capital_bigger, float(stock_financial_dict.get("total_capital"))):
             total_capital_bigger = float(stock_financial_dict.get("total_capital"))
         else:
             return False
         
         # check ruled_total_capital
-        if is_bigger(ruled_total_capital_bigger, float(stock_financial_dict.get("ruled_total_capital"))):
+        if ruled_total_capital_bigger == 0:
+            ruled_total_capital_bigger = float(stock_financial_dict.get("ruled_total_capital"))
+        elif is_bigger(ruled_total_capital_bigger, float(stock_financial_dict.get("ruled_total_capital"))):
+            ruled_total_capital_bigger = float(stock_financial_dict.get("ruled_total_capital"))
+        # lower than next value 
+        elif (is_inner_percent_next(5, ruled_total_capital_bigger, float(stock_financial_dict.get("ruled_total_capital")))
+            and float(stock_financial_dict.get("ruled_total_capital")) > float(stock_financial_dict.get("not_ruled_total_capital"))):
             ruled_total_capital_bigger = float(stock_financial_dict.get("ruled_total_capital"))
         else:
             return False
         
         # check not_ruled_total_capital
         if not_ruled_total_capital_lower == 0:
-            not_ruled_total_capital_lower = float(stock_financial_dict.get("ruled_total_capital"))
-
-        if is_lower(float(stock_financial_dict.get("not_ruled_total_capital")), not_ruled_total_capital_lower):
+            not_ruled_total_capital_lower = float(stock_financial_dict.get("not_ruled_total_capital"))
+        elif is_lower(float(stock_financial_dict.get("not_ruled_total_capital")), not_ruled_total_capital_lower):
+            not_ruled_total_capital_lower = float(stock_financial_dict.get("not_ruled_total_capital"))
+        # lower than total_capital 3percent
+        elif is_inner_percent_next(3, float(stock_financial_dict.get("not_ruled_total_capital")), float(stock_financial_dict.get("total_capital"))):
             not_ruled_total_capital_lower = float(stock_financial_dict.get("not_ruled_total_capital"))
         else:
             return False
         
         # check capital
-        if is_bigger(capital_bigger, float(stock_financial_dict.get("capital"))):
+        if capital_bigger == 0:
+            capital_bigger = float(stock_financial_dict.get("capital"))
+        elif is_bigger(capital_bigger, float(stock_financial_dict.get("capital"))):
+            capital_bigger = float(stock_financial_dict.get("capital"))
+        elif is_inner_percent_next(15, capital_bigger, float(stock_financial_dict.get("capital"))):
             capital_bigger = float(stock_financial_dict.get("capital"))
         else:
             return False
@@ -296,84 +331,138 @@ def check_low_stock(stock_list, stock_financial_dict_lists):
 
         # check CAPEX
         if CAPEX_lower == 0:
-            CAPEX_lower = float(stock_financial_dict.get("FCF"))
-
-        if is_lower(float(stock_financial_dict.get("CAPEX")), CAPEX_lower):
+            CAPEX_lower = float(stock_financial_dict.get("CAPEX"))
+        elif is_lower(float(stock_financial_dict.get("CAPEX")), CAPEX_lower):
+            CAPEX_lower = float(stock_financial_dict.get("CAPEX"))
+        elif is_inner_percent_next(80, CAPEX_lower, float(stock_financial_dict.get("CAPEX"))):
             CAPEX_lower = float(stock_financial_dict.get("CAPEX"))
         else:
             return False
         
         # check FCF
-        if is_bigger(FCF_bigger, float(stock_financial_dict.get("FCF"))):
+        if FCF_bigger == 0:
+            FCF_bigger = float(stock_financial_dict.get("FCF"))
+        elif is_bigger(FCF_bigger, float(stock_financial_dict.get("FCF"))):
+            FCF_bigger = float(stock_financial_dict.get("FCF"))
+        elif (is_inner_percent_next(30, FCF_bigger, float(stock_financial_dict.get("FCF")))
+            and float(stock_financial_dict.get("FCF")) > 0):
             FCF_bigger = float(stock_financial_dict.get("FCF"))
         else:
             return False
         
         # check interest_debt
         if interest_debt_lower == 0:
-            interest_debt_lower = float(stock_financial_dict.get("CFO"))
-
-        if is_lower(float(stock_financial_dict.get("interest_debt")), interest_debt_lower):
+            interest_debt_lower = float(stock_financial_dict.get("interest_debt"))
+        elif is_lower(float(stock_financial_dict.get("interest_debt")), interest_debt_lower):
+            interest_debt_lower = float(stock_financial_dict.get("interest_debt"))
+        elif is_inner_percent_next(15, interest_debt_lower, float(stock_financial_dict.get("interest_debt"))):
             interest_debt_lower = float(stock_financial_dict.get("interest_debt"))
         else:
             return False
         
         # check operating_profits_ratio
-        if is_bigger(operating_profits_ratio_bigger, float(stock_financial_dict.get("operating_profits_ratio"))):
+        if operating_profits_ratio_bigger == 0:
+            operating_profits_ratio_bigger = float(stock_financial_dict.get("operating_profits_ratio"))
+        elif is_bigger(operating_profits_ratio_bigger, float(stock_financial_dict.get("operating_profits_ratio"))):
+            operating_profits_ratio_bigger = float(stock_financial_dict.get("operating_profits_ratio"))
+        elif float(stock_financial_dict.get("operating_profits_ratio")) > 5:
             operating_profits_ratio_bigger = float(stock_financial_dict.get("operating_profits_ratio"))
         else:
             return False
         
         # check net_profit_ratio
-        if is_bigger(net_profit_ratio_bigger, float(stock_financial_dict.get("net_profit_ratio"))):
+        if net_profit_ratio_bigger == 0:
+            net_profit_ratio_bigger = float(stock_financial_dict.get("net_profit_ratio"))
+        elif is_bigger(net_profit_ratio_bigger, float(stock_financial_dict.get("net_profit_ratio"))):
+            net_profit_ratio_bigger = float(stock_financial_dict.get("net_profit_ratio"))
+        elif is_inner_percent_next(60, operating_profits_ratio_bigger, net_profit_ratio_bigger):
             net_profit_ratio_bigger = float(stock_financial_dict.get("net_profit_ratio"))
         else:
             return False
         
         # check ROE
-        if is_bigger(ROE_bigger, float(stock_financial_dict.get("ROE"))):
+        if ROE_bigger == 0:
+            ROE_bigger = float(stock_financial_dict.get("ROE"))
+        elif is_bigger(ROE_bigger, float(stock_financial_dict.get("ROE"))):
+            ROE_bigger = float(stock_financial_dict.get("ROE"))
+        elif (is_inner_percent_next(20, ROE_bigger, float(stock_financial_dict.get("ROE")))
+            or float(stock_financial_dict.get("ROE")) > 5):
             ROE_bigger = float(stock_financial_dict.get("ROE"))
         else:
             return False
         
         # check ROA
-        if is_bigger(ROA_bigger, float(stock_financial_dict.get("ROA"))):
+        if ROA_bigger == 0:
+            ROA_bigger = float(stock_financial_dict.get("ROA"))
+        elif is_bigger(ROA_bigger, float(stock_financial_dict.get("ROA"))):
+            ROA_bigger = float(stock_financial_dict.get("ROA"))
+        elif (is_inner_percent_next(20, ROA_bigger, float(stock_financial_dict.get("ROA")))
+            or float(stock_financial_dict.get("ROA")) > 3):
             ROA_bigger = float(stock_financial_dict.get("ROA"))
         else:
             return False
         
         # check debt_ratio
-        if is_lower(float(stock_financial_dict.get("debt_ratio")), debt_ratio_lower):
+        if debt_ratio_lower == 0:
+            debt_ratio_lower = float(stock_financial_dict.get("debt_ratio"))
+        elif is_lower(float(stock_financial_dict.get("debt_ratio")), debt_ratio_lower):
+            debt_ratio_lower = float(stock_financial_dict.get("debt_ratio"))
+        elif (is_inner_percent_next(20, debt_ratio_lower, float(stock_financial_dict.get("debt_ratio")))
+            and float(stock_financial_dict.get("debt_ratio")) < 100):
             debt_ratio_lower = float(stock_financial_dict.get("debt_ratio"))
         else:
             return False
         
         # check capital_reserve_ratio
-        if is_bigger(capital_reserve_ratio_bigger, float(stock_financial_dict.get("capital_reserve_ratio"))):
+        if capital_reserve_ratio_bigger == 0:
+            capital_reserve_ratio_bigger = float(stock_financial_dict.get("capital_reserve_ratio"))
+        elif is_bigger(capital_reserve_ratio_bigger, float(stock_financial_dict.get("capital_reserve_ratio"))):
+            capital_reserve_ratio_bigger = float(stock_financial_dict.get("capital_reserve_ratio"))
+        elif (is_inner_percent_next(3, capital_reserve_ratio_bigger, float(stock_financial_dict.get("capital_reserve_ratio")))
+            and float(stock_financial_dict.get("capital_reserve_ratio")) > 0):
             capital_reserve_ratio_bigger = float(stock_financial_dict.get("capital_reserve_ratio"))
         else:
             return False
         
         # check EPS
-        if is_bigger(EPS_bigger, float(stock_financial_dict.get("EPS"))):
+        if EPS_bigger == 0:
+            EPS_bigger = float(stock_financial_dict.get("EPS"))
+        elif is_bigger(EPS_bigger, float(stock_financial_dict.get("EPS"))):
+            EPS_bigger = float(stock_financial_dict.get("EPS"))
+        elif (is_inner_percent_next(10, EPS_bigger, float(stock_financial_dict.get("EPS")))
+            and float(stock_financial_dict.get("EPS")) > 0):
             EPS_bigger = float(stock_financial_dict.get("EPS"))
         else:
             return False
 
         # check PER
-        if is_lower(float(stock_financial_dict.get("PER")), PER_lower):
+        if PER_lower == 0:
+            PER_lower = float(stock_financial_dict.get("PER"))
+        elif is_lower(float(stock_financial_dict.get("PER")), PER_lower):
+            PER_lower = float(stock_financial_dict.get("PER"))
+        elif (is_inner_percent_next(20, PER_lower, float(stock_financial_dict.get("PER")))
+            or float(stock_financial_dict.get("PER")) < 10):
             PER_lower = float(stock_financial_dict.get("PER"))
         else:
             return False
 
         # check BPS
-        if is_bigger(BPS_bigger, float(stock_financial_dict.get("BPS"))):
+        if BPS_bigger == 0:
+            BPS_bigger = float(stock_financial_dict.get("BPS"))
+        elif is_bigger(BPS_bigger, float(stock_financial_dict.get("BPS"))):
+            BPS_bigger = float(stock_financial_dict.get("BPS"))
+        elif (is_inner_percent_next(10, BPS_bigger, float(stock_financial_dict.get("BPS")))
+            and float(stock_financial_dict.get("BPS")) > 0):
             BPS_bigger = float(stock_financial_dict.get("BPS"))
         else:
             return False
 
         # check PBR
-        if not(is_lower(PBR_lower_than_1, float(stock_financial_dict.get("PBR")))):
+        if PBR_lower_than_2 == 2:
+            PBR_lower_than_2 = float(stock_financial_dict.get("PBR"))
+        elif is_lower(float(stock_financial_dict.get("PBR")), PBR_lower_than_2):
+            PBR_lower_than_2 = float(stock_financial_dict.get("PBR"))
+        elif not(is_lower(2, float(stock_financial_dict.get("PBR")))):
             return False
 
         # check cash_DPS
@@ -384,6 +473,9 @@ def check_low_stock(stock_list, stock_financial_dict_lists):
 
         # check cash_dividend_yield_ratio
         if is_bigger(cash_dividend_yield_ratio_bigger, float(stock_financial_dict.get("cash_dividend_yield_ratio"))):
+            cash_dividend_yield_ratio_bigger = float(stock_financial_dict.get("cash_dividend_yield_ratio"))
+        elif (is_inner_percent_next(35, cash_dividend_yield_ratio_bigger, float(stock_financial_dict.get("cash_dividend_yield_ratio")))
+            and float(stock_financial_dict.get("cash_dividend_yield_ratio")) > 0):
             cash_dividend_yield_ratio_bigger = float(stock_financial_dict.get("cash_dividend_yield_ratio"))
         else:
             return False

@@ -99,15 +99,15 @@ def extract_accepted_low_value_stocks(temp_stocks_list):
     for idx, stock in enumerate(tbody):
         # get index, value from enumerate
         print(idx+1, stock[1])
-        temp_stock_dict = extract_stock_detail_dict(stock[-1])
+        temp_stock_dict = extract_stock_detail_dict(stock[-1])  # 테스트시 여기에 stock_number 넣어보면 됨 = insert test stock_number
         
         if check_low_stock(stock, temp_stock_dict["year_financial"]):
             if check_low_stock(stock, temp_stock_dict["quarter_financial"]):
                 low_stocks_list.append(stock)
             else:
-                print("Not Accept")
+                print("[Not Accept]\n")
         else:
-                print("Not Accept")
+                print("[Not Accept]\n")
 
     return low_stocks_list
 
@@ -144,5 +144,5 @@ def extract_low_value_stock(stock_kind_num):
     save_list_to_file(f"{CSV_FORDER}/{TODAY}_{stock_kind_name}_{FNAME_LOW_VALUATION_LIST}.{FILE_FORMAT}", stocks_accepted_low_value)
 
 # Extract!
-# extract_low_value_stock(KOSPI)
+extract_low_value_stock(KOSPI)
 extract_low_value_stock(KOSDAQ)
