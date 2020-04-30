@@ -104,6 +104,7 @@ def extract_accepted_low_value_stocks(temp_stocks_list):
         if check_low_stock(stock, temp_stock_dict["year_financial"]):
             if check_low_stock(stock, temp_stock_dict["quarter_financial"]):
                 low_stocks_list.append(stock)
+                print("[OK Accepted]\n")
             else:
                 print("[Not Accept]\n")
         else:
