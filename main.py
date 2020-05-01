@@ -3,15 +3,16 @@
 from datetime import datetime
 from naver_stocks_list import extract_stock_list_tbody, extract_stock_list_thead, extract_stock_detail_url
 from save import save_list_to_file
-from stock_evaluation import is_over, is_under, check_low_stock
+from stock_evaluation import is_over, is_under
 from daum_stock_detail import extract_stock_detail_dict
+from stock_finance_check import check_low_stock
 
 PRICE_STANDARD = 100000   # 현재가
 DIFF_STANDARD = []    # 전일비
 FLUC_STANDARD = []    # 등락률
 PAR_STANDARD = []  # 액면가
-KOSPI_CAPITALIZATION_STANDARD = 39000		  # KOSPI 시가총액
-KOSDAQ_CAPITALIZATION_STANDARD = 7000  # KOSDAQ 시가총액
+KOSPI_CAPITALIZATION_STANDARD = 1000		  # KOSPI 시가총액
+KOSDAQ_CAPITALIZATION_STANDARD = 500  # KOSDAQ 시가총액
 TOTAL_STOCKS_STANDARD = []   # 상장 주식수
 FOREIGN_STANDARD = [] # 외국인 비율
 VOLUME_STANDARD = []  # 거래량
@@ -33,7 +34,7 @@ FILE_FORMAT = "csv"
 
 FNAME_CAPITALIZATION_RANK = f"capitalization_rank"
 FNAME_LOW_VALUATION_LIST = f"low_valuation_list"
-FNAME_ACCEPTED_PER_ROE_LIST = f"_PER_ROE_list"
+FNAME_ACCEPTED_PER_ROE_LIST = f"PER_ROE_list"
 
 
 def extract_stock_thead(URL):
@@ -85,7 +86,7 @@ def extract_accept_PER_ROE_list(temp_stocks_list):
             if is_over(temp_ROE, ROE_STANDARD):
                 accept_PER_ROE_stocks.append(stock)
 
-    print(f"\n{FNAME_ACCEPTED_PER_ROE_LIST} : {len(accept_PER_ROE_stocks)-1}\n")
+    print(f"\n[Accepted]{FNAME_ACCEPTED_PER_ROE_LIST} : {len(accept_PER_ROE_stocks)-1}\n")
     return accept_PER_ROE_stocks
 
 
@@ -116,14 +117,11 @@ def extract_accepted_low_value_stocks(temp_stocks_list, finance_dict_list):
     # build low_stock_list
     for idx, stock in enumerate(tbody):
 
-        if check_low_stock(stock, finance_dict_list[idx].get("year_financial")):
-            if check_low_stock(stock, finance_dict_list[idx].get("quarter_financial")):
-                low_stocks_list.append(stock)
-                print(f"{idx+1}_{stock[1]}: [OK Accepted]")
-            else:
-                print(f"{idx+1}_{stock[1]}: [Not Accept]")
+        if check_low_stock(stock, finance_dict_list[idx]):
+            low_stocks_list.append(stock)
+            print(f"{idx+1}_{stock[1]}: [Ok Accept]")
         else:
-                print(f"{idx+1}_{stock[1]}: [Not Accept]")
+            print(f"{idx+1}_{stock[1]}: [Not Accept]")
 
     return low_stocks_list
 
