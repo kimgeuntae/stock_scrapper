@@ -38,9 +38,9 @@ def is_finance_fine(stock_list, stock_financial_dict_lists):
     # if not is_data_lower_big_percent_fine(stock_financial_dict_lists, "total_debt", 5):
     #     return False
     
-    # 자본총계
-    if not is_data_bigger_low_percent_fine(stock_financial_dict_lists, "total_capital", 5):
-        return False
+    # # 자본총계
+    # if not is_data_bigger_low_percent_fine(stock_financial_dict_lists, "total_capital", 5):
+    #     return False
     
     # # 자본총계(지배)
     # if not is_data_bigger_low_percent_fine(stock_financial_dict_lists, "ruled_total_capital", 10):
@@ -72,9 +72,8 @@ def is_finance_fine(stock_list, stock_financial_dict_lists):
     
     # # FCF = 잉여현금흐름
     # if not is_data_bigger_low_percent_fine(stock_financial_dict_lists, "FCF", 40):
-    #     return False
-    # elif not is_data_bigger_than_num_fine(stock_financial_dict_lists, "FCF", 0):
-    #     return False
+    #     if not is_data_bigger_than_num_fine(stock_financial_dict_lists, "FCF", 0):
+    #         return False
     
     # # 이자발생부채
     # if not is_data_lower_big_percent_fine(stock_financial_dict_lists, "interest_debt", 15):
@@ -82,73 +81,62 @@ def is_finance_fine(stock_list, stock_financial_dict_lists):
     
     # # 영업이익률
     # if not is_data_bigger_fine(stock_financial_dict_lists, "operating_profits_ratio"):
-    #     return False
-    # elif not is_data_bigger_than_num_fine(stock_financial_dict_lists, "operating_profits_ratio", 15):
-    #     return False
+    #     if not is_data_bigger_than_num_fine(stock_financial_dict_lists, "operating_profits_ratio", 15):
+    #         return False
     
-    # 순이익률
-    if not is_data_bigger_fine(stock_financial_dict_lists, "net_profit_ratio"):
-        return False
-    elif not is_data_bigger_than_num_fine(stock_financial_dict_lists, "net_profit_ratio", 10):
-        return False
+    # # 순이익률
+    # if not is_data_bigger_fine(stock_financial_dict_lists, "net_profit_ratio"):
+    #     if not is_data_bigger_than_num_fine(stock_financial_dict_lists, "net_profit_ratio", 20):
+    #         return False
 
     # ROE
     if not is_data_bigger_low_percent_fine(stock_financial_dict_lists, "ROE", 30):
-        return False
-    elif not is_data_bigger_than_num_fine(stock_financial_dict_lists, "ROE", 3):
-        return False
+        if not is_data_bigger_than_num_fine(stock_financial_dict_lists, "ROE", 3):
+            return False
     
     # ROA
     if not is_data_bigger_low_percent_fine(stock_financial_dict_lists, "ROA", 30):
-        return False
-    elif not is_data_bigger_than_num_fine(stock_financial_dict_lists, "ROA", 3):
-        return False
+        if not is_data_bigger_than_num_fine(stock_financial_dict_lists, "ROA", 3):
+            return False
     
     # 부채비율
-    if not is_data_lower_big_percent_fine(stock_financial_dict_lists, "debt_ratio", 20):
-        return False
-    elif not is_data_lower_than_num_fine(stock_financial_dict_lists, "debt_ratio", 130):
-        return False
+    if not is_data_lower_big_percent_fine(stock_financial_dict_lists, "debt_ratio", 40):
+        if not is_data_lower_than_num_fine(stock_financial_dict_lists, "debt_ratio", 130):
+            return False
     
     # # 자본유보율
     # if not is_data_bigger_low_percent_fine(stock_financial_dict_lists, "capital_reserve_ratio", 3):
-    #     return False
-    # elif not is_data_bigger_than_num_fine(stock_financial_dict_lists, "capital_reserve_ratio", 0):
-    #     return False
+    #     if not is_data_bigger_than_num_fine(stock_financial_dict_lists, "capital_reserve_ratio", 0):
+    #         return False
     
     # # EPS
     # if not is_data_bigger_low_percent_fine(stock_financial_dict_lists, "EPS", 20):
-    #     return False
-    # elif not is_data_bigger_than_num_fine(stock_financial_dict_lists, "EPS", 0):
-    #     return False
+    #     if not is_data_bigger_than_num_fine(stock_financial_dict_lists, "EPS", 0):
+    #         return False
     
     # # PER
     # if not is_data_lower_big_percent_fine(stock_financial_dict_lists, "PER", 30):
-    #     return False
-    # elif not is_data_lower_than_num_fine(stock_financial_dict_lists, "PER", 10):
-    #     return False
+    #     if not is_data_lower_than_num_fine(stock_financial_dict_lists, "PER", 10):
+    #         return False
     
     # # BPS
     # if not is_data_bigger_low_percent_fine(stock_financial_dict_lists, "BPS", 10):
-    #     return False
-    # elif not is_data_bigger_than_num_fine(stock_financial_dict_lists, "BPS", 0):
-    #     return False
+    #     if not is_data_bigger_than_num_fine(stock_financial_dict_lists, "BPS", 0):
+    #         return False
     
     # # PBR
     # if not is_data_lower_than_num_fine(stock_financial_dict_lists, "PBR", 2):
-    #     return False
-    # elif not is_data_lower_fine(stock_financial_dict_lists, "PBR"):
-    #     return False
+    #     if not is_data_lower_fine(stock_financial_dict_lists, "PBR"):
+    #         return False
 
-    # 현금DPS = 주당 배당금
-    if not is_data_bigger_fine(stock_financial_dict_lists, "cash_DPS"):
-        return False
+    # # 현금DPS = 주당 배당금
+    # if not is_data_bigger_fine(stock_financial_dict_lists, "cash_DPS"):
+    #     return False
     
     # # 현금배당수익률
     # if not is_data_bigger_low_percent_fine(stock_financial_dict_lists, "cash_dividend_yield_ratio", 35):
-    #     return False
-    # elif not is_data_bigger_than_num_fine(stock_financial_dict_lists, "BPS", 0):
-    #     return False
+    #     if not is_data_bigger_than_num_fine(stock_financial_dict_lists, "BPS", 0):
+    #         return False
     
     # # 현금배당성향
     # if not is_data_bigger_fine(stock_financial_dict_lists, "cash_dividend_payout_ratio"):
