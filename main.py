@@ -10,8 +10,8 @@ PRICE_STANDARD = 100000   # 현재가
 DIFF_STANDARD = []    # 전일비
 FLUC_STANDARD = []    # 등락률
 PAR_STANDARD = []  # 액면가
-KOSPI_CAPITALIZATION_STANDARD = 1500	  # KOSPI 시가총액
-KOSDAQ_CAPITALIZATION_STANDARD = 350  # KOSDAQ 시가총액
+KOSPI_CAPITALIZATION_STANDARD = 39000		  # KOSPI 시가총액
+KOSDAQ_CAPITALIZATION_STANDARD = 7000  # KOSDAQ 시가총액
 TOTAL_STOCKS_STANDARD = []   # 상장 주식수
 FOREIGN_STANDARD = [] # 외국인 비율
 VOLUME_STANDARD = []  # 거래량
@@ -33,7 +33,7 @@ FILE_FORMAT = "csv"
 
 FNAME_CAPITALIZATION_RANK = f"capitalization_rank"
 FNAME_LOW_VALUATION_LIST = f"low_valuation_list"
-FNAME_ACCEPTED_PER_ROE_LIST = f"accepted_PER_ROE_list"
+FNAME_ACCEPTED_PER_ROE_LIST = f"_PER_ROE_list"
 
 
 def extract_stock_thead(URL):
@@ -59,7 +59,7 @@ def extract_over_capi_standard_stocks(temp_stocks_list, capi_standard):
     over_capi_standard_stocks = []
     over_capi_standard_stocks.append(temp_stocks_list[0])
 
-    tbody = temp_stocks_list[1:-1]
+    tbody = temp_stocks_list[1:]
 
     # build over_capi_standard_stocks
     for stock in tbody:
@@ -74,7 +74,7 @@ def extract_accept_PER_ROE_list(temp_stocks_list):
     accept_PER_ROE_stocks = []
     accept_PER_ROE_stocks.append(temp_stocks_list[0])
 
-    tbody = temp_stocks_list[1:-1]
+    tbody = temp_stocks_list[1:]
 
     # build accept_PER_ROE_LIST
     for stock in tbody:
@@ -85,33 +85,47 @@ def extract_accept_PER_ROE_list(temp_stocks_list):
             if is_over(temp_ROE, ROE_STANDARD):
                 accept_PER_ROE_stocks.append(stock)
 
-    print(f"{FNAME_ACCEPTED_PER_ROE_LIST} : {len(accept_PER_ROE_stocks)-1}")
+    print(f"\n{FNAME_ACCEPTED_PER_ROE_LIST} : {len(accept_PER_ROE_stocks)-1}\n")
     return accept_PER_ROE_stocks
-    
 
-def extract_accepted_low_value_stocks(temp_stocks_list):
-    low_stocks_list = []
-    low_stocks_list.append(temp_stocks_list[0])
-    
-    tbody = temp_stocks_list[1:-1]
+
+def extract_finance_dict_list(temp_stocks_list):
+    finance_dict_list = []
+
+    tbody = temp_stocks_list[1:]
 
     # build low_stock_list
     for idx, stock in enumerate(tbody):
         # get index, value from enumerate
-        print(idx+1, stock[1])
-        temp_stock_dict = extract_stock_detail_dict(stock[-1])  # 테스트시 여기에 stock_number 넣어보면 됨 = insert test stock_number
+        print(idx + 1, stock[1])
         
-        if check_low_stock(stock, temp_stock_dict["year_financial"]):
-            if check_low_stock(stock, temp_stock_dict["quarter_financial"]):
+        temp_stock_dict = extract_stock_detail_dict(stock[-1])  # 테스트시 여기에 stock_number 넣어보면 됨 = insert test stock_number
+        finance_dict_list.append(temp_stock_dict)
+
+        print("\n")
+
+    return finance_dict_list
+
+
+def extract_accepted_low_value_stocks(temp_stocks_list, finance_dict_list):
+    low_stocks_list = []
+    low_stocks_list.append(temp_stocks_list[0])
+    
+    tbody = temp_stocks_list[1:]
+
+    # build low_stock_list
+    for idx, stock in enumerate(tbody):
+
+        if check_low_stock(stock, finance_dict_list[idx].get("year_financial")):
+            if check_low_stock(stock, finance_dict_list[idx].get("quarter_financial")):
                 low_stocks_list.append(stock)
-                print("[OK Accepted]\n")
+                print(f"{idx+1}_{stock[1]}: [OK Accepted]")
             else:
-                print("[Not Accept]\n")
+                print(f"{idx+1}_{stock[1]}: [Not Accept]")
         else:
-                print("[Not Accept]\n")
+                print(f"{idx+1}_{stock[1]}: [Not Accept]")
 
     return low_stocks_list
-
 
 def extract_low_value_stock(stock_kind_num):
     if stock_kind_num == 0:
@@ -141,7 +155,9 @@ def extract_low_value_stock(stock_kind_num):
     stocks_accept_PER_ROE = extract_accept_PER_ROE_list(stocks_capi_over_rank)
     save_list_to_file(f"{CSV_FORDER}/{TODAY}_{stock_kind_name}_{FNAME_ACCEPTED_PER_ROE_LIST}.{FILE_FORMAT}", stocks_accept_PER_ROE)
 
-    stocks_accepted_low_value = extract_accepted_low_value_stocks(stocks_accept_PER_ROE)
+    finance_dict_list = extract_finance_dict_list(stocks_accept_PER_ROE)
+
+    stocks_accepted_low_value = extract_accepted_low_value_stocks(stocks_accept_PER_ROE, finance_dict_list)
     save_list_to_file(f"{CSV_FORDER}/{TODAY}_{stock_kind_name}_{FNAME_LOW_VALUATION_LIST}.{FILE_FORMAT}", stocks_accepted_low_value)
 
 # Extract!
