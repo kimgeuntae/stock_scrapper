@@ -7,7 +7,7 @@ def is_finance_fine(stock_list, stock_financial_dict_lists):
         return False
     
     # 영업이익
-    if not is_data_bigger_low_percent_fine(stock_financial_dict_lists, "business_profits", 20):
+    if not is_data_bigger_low_percent_fine(stock_financial_dict_lists, "business_profits", 30):
         return False
     
     # # 영업이익(발표기준)
@@ -18,9 +18,9 @@ def is_finance_fine(stock_list, stock_financial_dict_lists):
     # if not is_data_bigger_than_num_fine(stock_financial_dict_lists, "pre_tax_business_profits", 1):
     #     return False
     
-    # # 당기순이익
-    # if not is_data_bigger_low_percent_fine(stock_financial_dict_lists, "net_income", 5):
-    #     return False
+    # 당기순이익
+    if not is_data_bigger_low_percent_fine(stock_financial_dict_lists, "net_income", 40):
+        return False
 
     # # 당기순이익(지배)
     # if not is_data_bigger_low_percent_fine(stock_financial_dict_lists, "ruled_net_income", 10):
@@ -54,13 +54,14 @@ def is_finance_fine(stock_list, stock_financial_dict_lists):
     # if not is_data_bigger_low_percent_fine(stock_financial_dict_lists, "capital", 15):
     #     return False
     
-    # 영업활동현금흐름
-    if not is_data_bigger_than_num_fine(stock_financial_dict_lists, "CFO", 0):
-        return False
+    # # 영업활동현금흐름
+    # if not is_data_bigger_low_percent_fine(stock_financial_dict_lists, "CFO", 10):
+    #     if not is_data_bigger_than_num_fine(stock_financial_dict_lists, "CFO", 0):
+    #         return False
     
-    # 투자활동현금흐름
-    if not is_data_lower_than_num_fine(stock_financial_dict_lists, "CFI", 0):
-        return False
+    # # 투자활동현금흐름
+    # if not is_data_lower_than_num_fine(stock_financial_dict_lists, "CFI", 0):
+    #     return False
     
     # # 재무활동현금흐름
     # if not is_data_lower_than_num_fine(stock_financial_dict_lists, "CFF", 0):
@@ -89,15 +90,15 @@ def is_finance_fine(stock_list, stock_financial_dict_lists):
     #     if not is_data_bigger_than_num_fine(stock_financial_dict_lists, "net_profit_ratio", 20):
     #         return False
 
-    # ROE
-    if not is_data_bigger_low_percent_fine(stock_financial_dict_lists, "ROE", 30):
-        if not is_data_bigger_than_num_fine(stock_financial_dict_lists, "ROE", 3):
-            return False
+    # # ROE
+    # if not is_data_bigger_low_percent_fine(stock_financial_dict_lists, "ROE", 30):
+    #     if not is_data_bigger_than_num_fine(stock_financial_dict_lists, "ROE", 3):
+    #         return False
     
-    # ROA
-    if not is_data_bigger_low_percent_fine(stock_financial_dict_lists, "ROA", 30):
-        if not is_data_bigger_than_num_fine(stock_financial_dict_lists, "ROA", 3):
-            return False
+    # # ROA
+    # if not is_data_bigger_low_percent_fine(stock_financial_dict_lists, "ROA", 30):
+    #     if not is_data_bigger_than_num_fine(stock_financial_dict_lists, "ROA", 3):
+    #         return False
     
     # 부채비율
     if not is_data_lower_big_percent_fine(stock_financial_dict_lists, "debt_ratio", 40):
